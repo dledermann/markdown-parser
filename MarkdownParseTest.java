@@ -46,7 +46,6 @@ public class MarkdownParseTest {
     @Test
     public void testFile5() throws IOException {
         ArrayList<String> test= new ArrayList<>();
-        test.add("page.com");
         Path fileName = Path.of("/Users/dylhead/Documents/GitHub/markdown-parser/test-file5.md");
         String content = Files.readString(fileName);
         assertEquals(test, MarkdownParse.getLinks(content));
@@ -54,7 +53,6 @@ public class MarkdownParseTest {
     @Test
     public void testFile6() throws IOException {
         ArrayList<String> test= new ArrayList<>();
-        test.add("page.com");
         Path fileName = Path.of("/Users/dylhead/Documents/GitHub/markdown-parser/test-file6.md");
         String content = Files.readString(fileName);
         assertEquals(test, MarkdownParse.getLinks(content));
