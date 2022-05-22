@@ -17,21 +17,28 @@ public class MarkdownParse {
             int closeBracket = markdown.indexOf("]", openBracket);
             int openParen = markdown.indexOf("(", closeBracket);
             int closeParen = markdown.indexOf(")", openParen);
-            if(openBracket==-1){
+            int lineBreak = markdown.indexOf("\n", openBracket);
+            if(openBracket==-1 || closeBracket==-1 || 
+                openParen==-1 || closeParen==-1){
                 break;
             }
-            if(closeBracket==-1){
-                break;
+            if(closeBracket>lineBreak || 
+            openParen>lineBreak || closeParen>lineBreak){
+                currentIndex=closeParen+1;
+                continue;
             }
-            if(openParen==-1){
-                break;
-            }
-            if(closeParen==-1){
-                break;
+            int save = closeBracket;
+            while(save<lineBreak && save!=-1){
+                closeBracket=save;
+                save=markdown.indexOf("]", save+1);
+            }save=closeParen;
+            while(save<lineBreak && save!=-1){
+                closeParen=save;
+                save=markdown.indexOf(")", save+1);
             }
             if(openBracket!=0){
                 String a=markdown.substring(openBracket-1,openBracket);
-                if((closeBracket==openParen-1) && !(a.equals("!"))){
+                if((closeBracket==openParen-1) && (a.equals("\n"))){
                     toReturn.add(markdown.substring(openParen + 1, closeParen));
                 }
             }
