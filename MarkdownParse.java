@@ -38,7 +38,8 @@ public class MarkdownParse {
             }
             if(openBracket!=0){
                 String a=markdown.substring(openBracket-1,openBracket);
-                if((closeBracket==openParen-1) && (a.equals("\n"))){
+                if((closeBracket==openParen-1) && (!a.equals("!")) &&
+                 (!a.equals("`"))){
                     toReturn.add(markdown.substring(openParen + 1, closeParen));
                 }
             }
