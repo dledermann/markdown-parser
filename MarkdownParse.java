@@ -4,60 +4,39 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import org.commonmark.node.*;
+import org.commonmark.parser.Parser;
 
 public class MarkdownParse {
 
-    public static ArrayList<String> getLinks(String markdown) {
-        ArrayList<String> toReturn = new ArrayList<>();
-        // find the next [, then find the ], then find the (, then read link upto next )
-        int currentIndex = 0;
-        // minor change added
-        while(currentIndex < markdown.length()) {
-            int openBracket = markdown.indexOf("[", currentIndex);
-            int closeBracket = markdown.indexOf("]", openBracket);
-            int openParen = markdown.indexOf("(", closeBracket);
-            int closeParen = markdown.indexOf(")", openParen);
-            int lineBreak = markdown.indexOf("\n", openBracket);
-            if(openBracket==-1 || closeBracket==-1 || 
-                openParen==-1 || closeParen==-1){
-                break;
-            }
-            if(closeBracket>lineBreak || 
-            openParen>lineBreak || closeParen>lineBreak){
-                currentIndex=closeParen+1;
-                continue;
-            }
-            int save = closeBracket;
-            while(save<lineBreak && save!=-1){
-                closeBracket=save;
-                save=markdown.indexOf("]", save+1);
-            }save=closeParen;
-            while(save<lineBreak && save!=-1){
-                closeParen=save;
-                save=markdown.indexOf(")", save+1);
-            }
-            if(openBracket!=0){
-                String a=markdown.substring(openBracket-1,openBracket);
-                if((closeBracket==openParen-1) && (!a.equals("!")) &&
-                 (!a.equals("`"))){
-                    toReturn.add(markdown.substring(openParen + 1, closeParen));
-                }
-            }
-            else{
-                if(closeBracket==openParen-1){
-                    toReturn.add(markdown.substring(openParen + 1, closeParen));
-                }
-            }
-            currentIndex = closeParen + 1;
-        }
-        return toReturn;
+    public ArrayList<String> getLinks(String markdown) {
+        Parser parser = Parser.builder().build();
+        Node node = parser.parse(markdown);
+        WordCountVisitor visitor = new WordCountVisitor();
+        node.accept(visitor);
+        return visitor.Links;
     }
+    class WordCountVisitor extends AbstractVisitor {
+        ArrayList<String> Links = new ArrayList<>();
 
+        @Override
+        public void visit(Link link) {
+            // This is called for all Text nodes. Override other visit methods for other node types.
+
+            // Count words (this is just an example, don't actually do it this way for various reasons).
+            Links.add(link.getDestination());
+            
+
+            // Descend into children (could be omitted in this case because Text nodes don't have children).
+            visitChildren(link);
+        }
+    }
 
     public static void main(String[] args) throws IOException {
         Path fileName = Path.of(args[0]);
         String content = Files.readString(fileName);
-        ArrayList<String> links = getLinks(content);
+        MarkdownParse test=new MarkdownParse();
+        ArrayList<String> links = test.getLinks(content);
 	    System.out.println(links);
         System.out.print(fileName);
     }
